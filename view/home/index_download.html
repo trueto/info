@@ -1,0 +1,55 @@
+<%- include header.html %>
+<style>
+  .center-block{
+    display: block;
+    margin-left: 35%;
+  }
+  .center-block p{
+    margin-left: 4%;
+    margin-top: 10%;
+  }
+</style>
+<div class="container" id="downloadApp">
+</div>
+<script type="text/babel">
+    var Container=React.createClass({
+        componentWillMount:function(){
+          $('#download').toggleClass('active');
+        },
+        openUrl:function() {
+          location.href="/getapk"
+        },
+        openHtml:function() {
+          location.href='http://android.myapp.com/myapp/detail.htm?apkName=io.dcloud.H5C4C964C';
+        },
+        render:function(){
+            return (
+              <div>
+                <div className="row">
+                  <p style={ { 'text-align':'center'} }>目前仅Android版上线，iOS没有账号啊！</p>
+                </div>
+                <br/>
+                <div className="row">
+                  <div className="col-sm-12 col-md-6 col-lg-6">
+                    <div className="center-block" onClick={ this.openUrl }>
+                      <img src="/static/img/infoapp.png" width="100px"/>
+                      <p><a>直接下载</a></p>
+                    </div>
+                  </div>
+                  <div className="col-sm-12 col-md-6 col-lg-6">
+                    <div className="center-block" onClick={ this.openHtml } >
+                    <img src="/static/img/infoapp.png" width="100px"/>
+                    <p><a>应用商店</a></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+        }
+    });
+    ReactDOM.render(
+        <Container />,
+        document.getElementById('downloadApp')
+    );
+</script>
+<%- include footer.html %>

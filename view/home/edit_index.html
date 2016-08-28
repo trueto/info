@@ -1,0 +1,207 @@
+<%- include header.html %>
+<!-- edit css -->
+<link rel="stylesheet" href="/static/css/bootstrap-material-datetimepicker.css">
+<link rel="stylesheet" href="/static/wangEditor/css/wangEditor.min.css">
+<link rel="stylesheet" href="/static/wangEditor-mobile/css/wangEditor-mobile.min.css">
+
+<!-- edit js -->
+<script type="text/javascript" src="/static/wangEditor/js/wangEditor.js"></script>
+<script src="/static/wangEditor-mobile/js/lib/zepto.js"></script>
+<script src="/static/wangEditor-mobile/js/lib/zepto.touch.js"></script>
+<script src="/static/wangEditor-mobile/js/wangEditor-mobile.js"></script>
+
+<script src="/static/js/moment-with-locales.min.js"></script>
+<script src="/static/js/bootstrap-material-datetimepicker.js"></script>
+
+<div class="container" id="editApp"></div>
+<script type="text/babel">
+  var Container=React.createClass({
+    componentWillMount() {
+      $("#edit").toggleClass("active");
+    },
+    componentDidMount() {
+      this.showDate();
+      this.showEditor();
+      $('#token').on('focus',function(){
+          $('#tokenerr').removeClass('has-error');
+          $('#tokenerror').text('');
+      });
+      $('#date').on('focus',function(){
+          $('#dateerr').removeClass('has-error');
+          $('#dateerror').text('');
+      });
+      $('#title').on('focus',function(){
+          $('#titleerr').removeClass('has-error');
+          $('#titleerror').text('');
+      });
+      $('#mood').on('focus',function(){
+          $('#mooderr').removeClass('has-error');
+          $('#mooderror').text('');
+      });
+    },
+    showDate(){
+      $('#date').bootstrapMaterialDatePicker({ format : 'YYYY/MM/DD HH:mm', minDate : new Date() });
+    },
+    showEditor(){
+      //平台、设备和操作系统
+      var system ={
+        win : false,
+        mac : false,
+        xll : false
+      };
+      //检测平台
+      var p = navigator.platform;
+      system.win = p.indexOf("Win") == 0;
+      system.mac = p.indexOf("Mac") == 0;
+      system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);
+      //跳转语句
+      if(system.win||system.mac||system.xll){
+          //web平台
+          var editor=new wangEditor('content');
+          editor.config.emotionsShow='icon';
+          //自定义菜单
+          editor.config.menus= [
+              'emotion',
+              'img',
+              'insertcode',
+              '|',
+              'link',
+              'unlink',
+              'table',
+              '|',
+              'bold',
+              'underline',
+              'italic',
+              'strikethrough',
+              'eraser',
+              'forecolor',
+              'bgcolor',
+              '|',
+              'quote',
+              'fontfamily',
+              'fontsize',
+              'head',
+              'unorderlist',
+              'orderlist',
+              'alignleft',
+              'aligncenter',
+              'alignright',
+              '|',
+              'undo',
+              'redo',
+              'fullscreen'
+          ];
+           // 上传图片（举例）
+          editor.config.uploadImgUrl = '/upload';
+
+          // 配置自定义参数（举例）
+          editor.config.uploadParams = {
+              token: '021598ab'
+          };
+          //统一参数名
+          editor.config.uploadImgFileName="img";
+          // 设置 headers（举例）
+          editor.config.uploadHeaders = {
+              'Accept' : 'text/x-json'
+          };
+          editor.create();
+      }else{
+          $(function(){
+              // ___E 三个下划线
+              var editor = new ___E('content');
+              editor.config.menus=[
+                  'img',
+                  'happy',
+                  'head',
+                  'bold',
+                  'color',
+                  'quote',
+                  'list',
+              ];
+              editor.config.uploadImgUrl = '/upload';
+              editor.config.loadingImg = '/static/img/default.jpg';
+              editor.init();
+          });
+      }
+    },
+    onSubmit(e){
+      var token=$('#token').val();
+      var date=$('#date').val();
+      var content=$('#content').val();
+      var title=$('#title').val();
+      var mood=$('#mood').val();
+      if(token.length==0){
+          $('#tokenerr').addClass('has-error');
+          $('#tokenerror').text('token不能为空！');
+          e.preventDefault();
+          return;
+      }
+      if(mood.length==0){
+          $('#mooderr').addClass('has-error');
+          $('#mooderror').text('mood不能为空！');
+          e.preventDefault();
+          return;
+      }
+      if(date.length==0){
+          $('#dateerr').addClass('has-error');
+          $('#dateerror').text('date不能为空！');
+          e.preventDefault();
+          return;
+      }
+      if(title.length==0){
+          $('#titleerr').addClass('has-error');
+          $('#titleerror').text('title不能为空！');
+          e.preventDefault();
+          return;
+      }
+      if(content.length==0){
+          $('#contenterr').addClass('has-error');
+          $('#contenterror').text('内容不能为空！');
+          e.preventDefault();
+          return;
+      }
+    },
+    render() {
+      return (
+        <form id="submit" method="POST" action="/meg" onSubmit={ this.onSubmit }>
+          <div className="row">
+           <div className="form-group col-md-6 col-sm-6 col-xs-12 col-lg-6" id="tokenerr">
+               <label>秘钥：<i id="tokenerror"></i></label>
+               <input type="password" className="form-control" id="token" name="token" placeholder="token" />
+           </div>
+           <div className="form-group col-md-6 col-sm-6 col-xs-12 col-lg-6" id="dateerr">
+               <label>日期：<i id="dateerror"></i></label>
+               <input type="text" className="form-control" id="date" name="date" placeholder="date" />
+           </div>
+           <div className="form-group col-md-6 col-sm-6 col-xs-12 col-lg-6" id="titleerr">
+               <label>标题：<i id="titleerror"></i></label>
+               <slect></slect>
+               <input type="text" className="form-control" id="title" name="title" placeholder="title" />
+           </div>
+           <div className="form-group col-md-6 col-sm-6 col-xs-12 col-lg-6" id="mooderr">
+               <label>心情：<i id="mooderror"></i></label>
+               <select name="mood" id="mood" className="form-control">
+          		    <option value="0">微笑</option>
+                  <option value="1">呲牙</option>
+                  <option value="2">惊讶</option>
+                  <option value="3">哭泣</option>
+                  <option value="4">色色</option>
+          	    </select>
+           </div>
+           </div>
+           <div className="form-group" id="contenterr">
+               <label>内容：<i id="contenterror"></i></label>
+               <textarea name="content" id="content" rows="3" style={ { height:350 } } className="form-control">
+               </textarea>
+           </div>
+           <button type="submit" className="btn btn-default btn-block">提交</button>
+        </form>
+      );
+    }
+  });
+  ReactDOM.render(
+    <Container />,
+    document.getElementById('editApp')
+  );
+</script>
+<%- include footer.html %>

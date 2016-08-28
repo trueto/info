@@ -1,0 +1,150 @@
+<%- include header.html %>
+<!-- Blog css -->
+<link rel="stylesheet" href="/static/css/component.css" charset="utf-8">
+<div class="container" id="detail"></div>
+<script type="text/babel">
+  var Container=React.createClass({
+    getInitialState:function () {
+      return {
+        data:[{
+          date:"2016-07-28 18:38",
+          mood:2,
+          title:"初始化信息",
+          content:"欢迎来到info.trueto.cn!"
+        }],
+        page:1,
+        limit:2,
+        totalPage:0,
+        preStatus: "previous disabled",
+        nextStatus: "next disabled"
+      };
+    },
+    componentWillMount() {
+      $("#study").toggleClass("active");
+      this.getNote();
+    },
+    getNote(){
+      var that=this;
+      var page=this.state.page;
+      $.ajax({
+        url:'/note',
+        type:'post',
+        dataType:'json',
+        data:{
+          page:page,
+          limit:this.state.limit
+        },
+        success:function(data) {
+          var _data=data;
+          var totalPage=_data.totalPages;
+          that.setState({
+            data:_data.data,
+            totalPage:totalPage,
+            preStatus: page==1 ? "previous disabled" : "previous",
+            nextStatus: page>=totalPage ? "next disabled" : "next"
+          });
+        }
+      });
+    },
+    handlePre(){
+      var page=this.state.page;
+      if (this.state.page >= 2) {
+        this.setState({
+          page:--this.state.page
+        });
+      }else {
+        this.setState({
+          page:1
+        });
+      }
+      this.getNote();
+    },
+    hanleNex(){
+      if (this.state.page <= this.state.totalPage-1) {
+        this.setState({
+          page:++this.state.page
+        });
+      }else {
+        this.setState({
+          page:this.state.totalPage
+        });
+      }
+      this.getNote();
+    },
+    render:function() {
+      return(
+        <div>
+         <Blog data={ this.state.data }/>
+         <nav>
+         	<ul className="pager">
+         		<li className={ this.state.preStatus }><a onClick={ this.handlePre }>上一页</a></li>
+         		<li className={ this.state.nextStatus }><a onClick={ this.hanleNex }>下一页</a></li>
+         	</ul>
+         </nav>
+        </div>
+      );
+    }
+  });
+  var Blog=React.createClass({
+    render:function() {
+      var list=this.props.data.map(function(_data) {
+        return(<List data={ _data } />);
+      });
+      return (
+        <ul className="cbp_tmtimeline" id="content">
+      		{ list }
+      	</ul>
+      );
+    }
+  });
+  var List=React.createClass({
+    moodurl(i){
+      var m=0;
+  		switch (i){
+  			case 0:
+  				m=14;
+  				break;
+  			case 1:
+  				m=13;
+  				break;
+  			case 2:
+  				m=1;
+  				break;
+  			case 3:
+  				m=9;
+  				break;
+  			default:
+  				m=3;
+  				break;
+  		}
+  		return 'http://emoji.trueto.cn/'+m+'.gif';
+    },
+    render:function() {
+      var arr=this.props.data.date.split(" ");
+      var data=this.props.data;
+      return (
+        <li>
+          <time className="cbp_tmtime"><span>{ arr[0] }</span><span>{ arr[1] }</span></time>
+          <div className="cbp_tmicon"><img src={ this.moodurl(data.mood) } alt=""/></div>
+          <div className="cbp_tmlabel">
+            <h2>{ data.title }</h2>
+            <p dangerouslySetInnerHTML={{__html:data.content}}></p>
+          </div>
+        </li>
+      );
+    }
+  });
+  // var Pager=React.createClass({
+  //   render(){
+  //     var that=this.props.father;
+  //     return(
+  //
+  //     );
+  //   }
+  // });
+  ReactDOM.render(
+    <Container />,
+    document.getElementById('detail')
+  );
+</script>
+<%- include footer.html %>

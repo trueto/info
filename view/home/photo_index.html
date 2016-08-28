@@ -1,0 +1,250 @@
+<%- include header.html %>
+<!-- photo css -->
+<link rel="stylesheet" href="/static/css/hexagons.css">
+<link rel="stylesheet" href="/static/css/ssi-uploader.css">
+<!--  photo js-->
+<script src="/static/js/ssi-uploader.js"></script>
+
+<div class="container" id="photoApp"></div>
+<script type="text/babel">
+var Photos=React.createClass({
+  getInitialState:function () {
+    var photoInfo=[{
+      id:'default',
+      title:'默认花名',
+      photodesc:'春花秋月夜',
+      url:'/static/img/default.jpg'
+    }];
+    //平台、设备和操作系统
+    var system ={
+      win : false,
+      mac : false,
+      xll : false
+    };
+    //检测平台
+    var p = navigator.platform;
+    system.win = p.indexOf("Win") == 0;
+    system.mac = p.indexOf("Mac") == 0;
+    system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);
+    var limit=0;
+    if(system.win||system.mac||system.xll){
+      //web
+      limit=9;
+    }else{
+      limit=5;
+    }
+    return {
+      photo:photoInfo,
+      page:1,
+      limit:limit,
+      totalPage:0,
+      preStatus: "previous disabled",
+      nextStatus: "next disabled",
+      uploadFormDisplayed:false,
+      searchFormDisplayed:false
+    };
+  },
+  componentWillMount:function () {
+    $("#photo").toggleClass("active");
+    this.getPhoto('');
+  },
+  onToggleUploadForm:function() {
+    this.setState({
+      uploadFormDisplayed: !this.state.uploadFormDisplayed,
+      searchFormDisplayed: false
+    });
+  },
+  onToggleSearchForm:function() {
+    this.setState({
+      uploadFormDisplayed:false,
+      searchFormDisplayed: !this.state.searchFormDisplayed
+    });
+  },
+  getPhoto:function(searchValue) {
+    var that =this;
+    var page=this.state.page;
+    $.ajax({
+      url:'/getphoto',
+      type:'post',
+      dataType:'json',
+      data:{
+        page:page,
+        limit:that.state.limit,
+        searchValue:searchValue
+      },
+      success:function (data) {
+        var _data=data;
+        var totalPage=_data.totalPages;
+        that.setState({
+          photo:_data.data,
+          totalPage:totalPage,
+          preStatus: page==1 ? "previous disabled" : "previous",
+          nextStatus: page>=totalPage ? "next disabled" : "next"
+        });
+      },
+      error:function () {
+        console.log('error');
+      }
+    });
+  },
+  handlePre(){
+    var searchValue = $('#search').val();
+    if (this.state.page >= 2) {
+      this.setState({
+        page:--this.state.page
+      });
+    }else {
+      this.setState({
+        page:1
+      });
+    }
+    this.getPhoto(searchValue);
+  },
+  hanleNex(){
+    var searchValue = $('#search').val();
+    if (this.state.page <= this.state.totalPage-1) {
+      this.setState({
+        page:++this.state.page
+      });
+    }else {
+      this.setState({
+        page:this.state.totalPage
+      });
+    }
+    this.getPhoto(searchValue);
+  },
+  searchPhoto:function () {
+    var searchValue = $('#search').val();
+    this.getPhoto(searchValue);
+  },
+  render:function() {
+    var photo=this.state.photo;
+    var photos=photo.map(function (_photo) {
+      return(<Photo photoinfo={ _photo }/>);
+    });
+    var modals=photo.map(function (_photo) {
+      return (<Modal photoInfo={ _photo } />);
+    });
+    return(
+      <div>
+      <div className="row">
+        <div className="col-md-4 col-xs-4 col-lg-4">
+            <a  onClick={ this.onToggleSearchForm }><i className="fa fa-search pull-right active"></i></a>
+        </div>
+        <div className="col-md-4 col-xs-4 col-lg-4"></div>
+        <div className="col-md-4 col-xs-4 col-lg-4">
+          <a  onClick={ this.onToggleUploadForm }><i className="fa fa-upload"></i></a>
+        </div>
+      </div>
+      <br/>
+      <Upload  uploadFormDisplayed={ this.state.uploadFormDisplayed } />
+      <Search searchFormDisplayed={ this.state.searchFormDisplayed } father={ this }/>
+
+      <ul className="hexGrid">
+        { photos }
+      </ul>
+      { modals }
+      <Pager father={ this }/>
+      </div>
+    );
+  }
+});
+var Photo=React.createClass({
+  render:function() {
+    var photo=this.props.photoinfo;
+    var id = '#'+photo.id;
+    return(
+      <li  className="hex" data-toggle="modal" data-target={ id }>
+        <a  className="hexIn">
+          <img src={ photo.url } alt="" />
+          <h1>{ photo.title }</h1>
+          <p>{ photo.photodesc }</p>
+        </a>
+      </li>
+    );
+  }
+});
+var Search=React.createClass({
+  render:function() {
+    var styleObj={
+      display:this.props.searchFormDisplayed ? 'block' : 'none'
+    };
+    return(
+      <div>
+      <div className="row"  style={ styleObj }>
+        <div className="input-group">
+          <input type="text" className="form-control" placeholder="站内搜图" id="search"/>
+          <span className="input-group-btn">
+            <button className="btn btn-default" type="button" onClick={this.props.father.searchPhoto}><i className="fa fa-search"></i></button>
+          </span>
+        </div>
+      </div>
+      <br/>
+      </div>
+    );
+  }
+});
+var Upload=React.createClass({
+  componentDidMount:function() {
+    $('#ssi-upload').ssi_uploader({
+      url:'/photoupload',
+      maxFileSize:6,
+      allowed:['jpg','gif','png'],
+      onUpload:function() {
+        // 刷新页面
+        setTimeout(function () {
+          location.href="/photo";
+        }, 1000);
+      }
+    });
+  },
+  render:function() {
+    var styleObj={
+      display:this.props.uploadFormDisplayed ? 'block' : 'none'
+    };
+    return(
+      <div className="row" id="upload" style={ styleObj }>
+        <div className="col-md-12">
+          <input type="file" multiple id="ssi-upload"/>
+        </div>
+      </div>
+    );
+  }
+});
+var Modal=React.createClass({
+  render:function() {
+    var photo =this.props.photoInfo;
+    return(
+      <div className="modal fade" tabindex="-1" role="dialog" id={ photo.id }>
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <img src={ photo.url } alt="" className="img-responsive"/>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+var Pager =React.createClass({
+  render:function () {
+    var that = this.props.father;
+    return(
+      <div className="row">
+        <div className="col-md-12 col-lg-12 col-xs-12">
+          <nav>
+            <ul className="pager">
+              <li className={ that.state.preStatus }><a onClick={ that.handlePre }>上一页</a></li>
+              <li className={ that.state.nextStatus }><a onClick={ that.hanleNex }>下一页</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    );
+  }
+});
+ReactDOM.render(
+  <Photos />,
+  document.getElementById('photoApp')
+);
+</script>
+<%- include footer.html %>

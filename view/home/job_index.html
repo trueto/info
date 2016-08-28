@@ -1,0 +1,241 @@
+<%- include header.html %>
+<!-- resume css -->
+<link rel="stylesheet" href="/static/css/material-cards.css">
+<link rel="stylesheet" href="/static/css/progress.css">
+
+<div class="container" id="jobApp"></div>
+<script type="text/babel">
+  var Container =React.createClass({
+    getInitialState() {
+      var data={
+        job:{
+          title:"期望职位",
+          content:"前端:(Reactjs||React-Native);后端:(PHP||Nodejs||Python)"
+        },
+        ability:{
+          title:"执业技能",
+          contents:[{
+            name:"HTML5",
+            score:90
+          },{
+            name:"Javascript",
+            score:85
+          },{
+            name:"Bootstrap",
+            score:80
+          },{
+            name:"Reactjs",
+            score:80
+          },{
+            name:"jQuery",
+            score:80
+          },{
+            name:"Thinkjs",
+            score:75
+          },{
+            name:"Express",
+            score:70
+          },{
+            name:"React-Native",
+            score:65
+          },{
+            name:"Cocos2d-js",
+            score:60
+          }]
+        },
+        experence:{
+          title:"项目经验",
+          contents:[{
+            name:"TrueTo 0.2",
+            time:"2016/07/28-2016/08/1",
+            content:'TrueTo 0.2由Bootstrap、Reactjs、jQuery等前端框架，Thinkjs后端框架，Mysql数据库及各种插件搭建而成；用于自己技术练手及记录学习足迹。'
+          },{
+            name:"TrueTo 0.1",
+            time:"2016/06/10-2016/06/12",
+            content:'TrueTo 0.1由Bootstrap、Reactjs、jQuery等前端框架，Express后端框架，Mysql数据库及各种插件搭建而成；用于自己技术练手及记录学习足迹。'
+          }]
+        },
+        education:{
+          title:"教育背景",
+          contents:[{
+            name:"浙江大学",
+            time:"2013/08-2018/06",
+            content:"本科--预防医学--get√医学学士"
+          },{
+            name:"贵州省思南中学",
+            time:"2010/09-2013/06",
+            content:"高中--理科--get√--浙江大学录取"
+          }]
+        },
+        love:{
+          title:"兴趣爱好",
+          content:"编程，摄影，电影，篮球，足球，游泳"
+        }
+      };
+      return {
+        data:data
+      };
+    },
+    componentWillMount() {
+      $("#resume").toggleClass("active");
+    },
+    componentDidMount() {
+      $('.material-card > .mc-btn-action').click(function () {
+          var card = $(this).parent('.material-card');
+          var icon = $(this).children('i');
+          icon.addClass('fa-spin-fast');
+
+          if (card.hasClass('mc-active')) {
+              card.removeClass('mc-active');
+
+              window.setTimeout(function() {
+                  icon
+                      .removeClass('fa-arrow-left')
+                      .removeClass('fa-spin-fast')
+                      .addClass('fa-info');
+
+              }, 800);
+          } else {
+              card.addClass('mc-active');
+
+              window.setTimeout(function() {
+                  icon
+                      .removeClass('fa-info')
+                      .removeClass('fa-spin-fast')
+                      .addClass('fa-arrow-left');
+
+              }, 800);
+          }
+      });
+    },
+    render:function() {
+      return (
+        <div className="row active-with-click">
+          <div className="col-md-12 col-sm-12 col-xs-12 col-lg-offset-2 col-lg-8">
+              <article className="material-card Blue-Grey">
+                  <h2>
+                    <span>杨飞洪</span>
+                    <strong>
+                        <i className="fa fa-fw fa-tag"></i>
+                        个人简历
+                    </strong>
+                  </h2>
+                  <a className="mc-btn-action">
+                    <i className="fa fa-info"></i>
+                  </a>
+                  <Content data={ this.state.data }/>
+                  <Footer />
+              </article>
+            </div>
+          </div>
+      );
+    }
+  });
+  var Content=React.createClass({
+    render() {
+      var data=this.props.data;
+      var list=data.ability.contents.map(function(_data) {
+        return(<List data={ _data }/>);
+      });
+      var listEx=data.experence.contents.map(function(_data) {
+        return(<ListEx data={ _data }/>);
+      });
+      var listEd=data.education.contents.map(function(_data) {
+        return(<ListEd data={ _data }/>);
+      });
+      return (
+        <div className="mc-content">
+            <div className="img-container">
+              <img className="img-responsive" src="/static/img/avtar.jpg" />
+            </div>
+            <div className="mc-description">
+              <h3>{ data.job.title }</h3>
+              <p>{ data.job.content }</p>
+              <hr/>
+              <h3>{ data.ability.title }</h3>
+              <div className="row">
+                  <div className="col-lg-12">
+                   { list }
+                  </div>
+              </div>
+              <h3>{ data.experence.title }</h3>
+              { listEx }
+              <h3>{ data.education.title }</h3>
+              { listEd }
+              <h3>{ data.love.title }</h3>
+              <p>{ data.love.content }</p>
+            </div>
+        </div>
+      );
+    }
+  });
+  var List=React.createClass({
+    render() {
+      var data=this.props.data;
+      var style={
+        width:data.score + "%",
+        background:"rgba(0,160,233,"+data.score/100+")"
+      };
+      return (
+        <div>
+        <h3 className="progressbar-title">{ data.name }</h3>
+        <div className="progress">
+            <div className="progress-bar" style={ style }>
+                <span>{ data.score }%</span>
+            </div>
+        </div>
+        </div>
+      );
+    }
+  });
+  var ListEx=React.createClass({
+    render() {
+      var data=this.props.data;
+      var style={
+         color:"#808080"
+      }
+      return (
+        <div>
+        <h4>{ data.name }<span className="pull-right" style={ style }>{ data.time }</span></h4>
+        <p>{ data.content }</p>
+        <hr/>
+        </div>
+      );
+    }
+  });
+  var ListEd=React.createClass({
+    render() {
+      var data=this.props.data;
+      var style={
+         color:"#808080"
+      }
+      return (
+        <div>
+        <h4>{ data.name }<span className="pull-right" style={ style }>{ data.time }</span></h4>
+        <p>{ data.content }</p>
+        <hr/>
+        </div>
+      );
+    }
+
+  });
+  var Footer=React.createClass({
+    render() {
+      return (
+        <div className="mc-footer">
+            <h4>
+                联系方式
+            </h4>
+            <a className="fa fa-fw fa-envelope" href="mailto:3130103836@zju.edu.cn?subject=你好，trueto" target="_blank"></a>
+            <a className="fa fa-fw fa-phone" href="sms:18868150826" target="_blank"></a>
+            <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=1509359472&site=qq&menu=yes"><img src="http://wpa.qq.com/pa?p=2:1509359472:52" alt="点击这里给我发消息" title="点击这里给我发消息"/></a>
+        </div>
+      );
+    }
+  });
+  ReactDOM.render(
+    <Container />,
+    document.getElementById('jobApp')
+  );
+</script>
+<%- include footer.html %>

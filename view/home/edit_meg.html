@@ -1,0 +1,26 @@
+<%- include header.html %>
+<div class="container" id="messageApp"></div>
+<script type="text/babel">
+  var Container=React.createClass({
+    getInitialState() {
+      return {
+        timer: 3
+      };
+    },
+    render() {
+      setTimeout(function() {
+        location.href="/";
+      },this.state.timer*1000);
+      return (
+        <div>
+        <h1><small>添加成功！{ this.state.timer }秒后返回<a href="/">首页</a></small></h1>
+        </div>
+      );
+    }
+  });
+  ReactDOM.render(
+    <Container />,
+    document.getElementById('messageApp')
+  );
+</script>
+<%- include footer.html %>

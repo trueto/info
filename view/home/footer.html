@@ -1,0 +1,157 @@
+<div id="footApp">
+</div>
+<script type="text/babel">
+  var FootApp=React.createClass({
+    getInitialState:function() {
+      var data={
+        about:{
+          title:"关于trueto",
+          comment:"本站用于记录浙大预防医学生trueto的成长经历"
+        },
+        linkurl:{
+          title:"友情链接",
+          comment:[{
+            url:"http://www.bootcss.com/",
+            title:"Bootstrap中文网"
+          },{
+            url:"http://www.dcloud.io/",
+            title:"dcloud官网"
+          },{
+            url:"http://www.htmleaf.com/",
+            title:"jQuery之家"
+          },{
+            url:"http://nodejs.org/en/",
+            title:"Nodejs"
+          }]
+        },
+        tools:{
+          title:"相关技术",
+          comment:[{
+            url:"http://www.bootcss.com/",
+            title:"Bootstrap"
+          },{
+            url:"https://jquery.com/",
+            title:"jQuery"
+          },{
+            url:"https://thinkjs.org/",
+            title:"Thinkjs"
+          },{
+            url:"https://facebook.github.io/react/index.html",
+            title:"Reactjs"
+          },{
+            url:"http://wangeditor.github.io/m/",
+            title:"wangEditor"
+          }]
+        },
+        copyright:{
+          time:new Date().getFullYear(),
+          beian:"浙ICP备15018345号",
+          right:"版权所有"
+        }
+      };
+      return data;
+    },
+    render:function () {
+      return(
+        <div>
+        <br/>
+        <footer id="footer" className="footer hidden-print">
+          <div className="container">
+              <div className="row">
+                <About data={ this.state.about }/>
+                <LinkUrl data={ this.state.linkurl }/>
+                <Tools data={ this.state.tools }/>
+              </div>
+          </div>
+          <CopyRight data={ this.state.copyright }/>
+          <Foot />
+        </footer>
+        </div>
+      );
+    }
+  });
+  var About=React.createClass({
+    render:function() {
+      return(
+        <div className="footer-about col-md-4 col-sm-12" id="about">
+            <h4>{ this.props.data.title }</h4>
+            <p>{ this.props.data.comment }</p>
+        </div>
+      );
+    }
+  });
+  var LinkUrl=React.createClass({
+    render:function() {
+      var list =this.props.data.comment.map(function(data) {
+        return(<List data={ data }/>);
+      });
+      return(
+        <div className="footer-links col-md-4 col-sm-12">
+            <h4>{ this.props.data.title }</h4>
+            <ul className="list-unstyled">
+                <li>
+                  { list }
+                </li>
+            </ul>
+        </div>
+      );
+    }
+  });
+
+  var Tools=React.createClass({
+    render:function() {
+      var list=this.props.data.comment.map(function(data) {
+        return(<List data={ data }/>)
+      });
+      return(
+        <div className="footer-techs col-md-4 col-sm-12">
+            <h4>{ this.props.data.title }</h4>
+            <ul className="list-unstyled">
+                <li>
+                  { list }
+                </li>
+            </ul>
+        </div>
+      );
+    }
+  });
+  var List=React.createClass({
+    render:function() {
+      return(
+        <span>
+        <a href={ this.props.data.url } target="_blank">{ this.props.data.title }</a>&nbsp;&nbsp;&nbsp;
+        </span>
+      );
+    }
+  });
+  var CopyRight=React.createClass({
+    render:function() {
+      return(
+        <div className="copy-right">
+            <span>&copy;2015-{ this.props.data.time }</span>
+            <span>{ this.props.data.beian }</span>
+            <span>{ this.props.data.right }</span>
+        </div>
+      );
+    }
+  });
+  var Foot=React.createClass({
+    render() {
+      var style={
+        display: "block"
+      };
+      return (
+        <a href="#" id="back-to-top" style={ style }>
+            <i className="fa fa-angle-up"></i>
+        </a>
+      );
+    }
+
+  });
+  ReactDOM.render(
+    <FootApp />,
+    document.getElementById('footApp')
+  );
+</script>
+</body>
+</html>
